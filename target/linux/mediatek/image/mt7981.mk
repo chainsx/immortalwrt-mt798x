@@ -5,6 +5,11 @@ MT7981_USB_PKGS := automount blkid blockdev fdisk \
     luci-app-usb-printer luci-i18n-usb-printer-zh-cn \
     kmod-usb-net-rndis usbutils
 
+MT7981_WWAN_PKGS := wwan uqmi modemmanager \
+    luci-proto-modemmanager luci-proto-qmi \
+    kmod-usb-net-cdc-ether kmod-usb-net-cdc-mbim kmod-usb-net-cdc-ncm \
+    kmod-usb-serial-option kmod-usb-serial-qualcomm
+
 define Device/mt7981-spim-nor-rfb
   DEVICE_VENDOR := MediaTek
   DEVICE_MODEL := mt7981-spim-nor-rfb
@@ -809,3 +814,21 @@ define Device/routerich_ax3000
   DEVICE_PACKAGES := $(MT7981_USB_PKGS)
 endef
 TARGET_DEVICES += routerich_ax3000
+
+define Device/hc_g80_100m
+  DEVICE_VENDOR := MediaTek
+  DEVICE_MODEL := HC-G80 (with 100M Flash)
+  DEVICE_DTS := mt7981-hc-g80-100M
+  DEVICE_DTS_DIR := $(DTS_DIR)/mediatek
+  SUPPORTED_DEVICES := HC,HC-G80
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 131072k
+  KERNEL_IN_UBI := 1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES := $(MT7981_USB_PKGS) $(MT7981_WWAN_PKGS)
+endef
+TARGET_DEVICES += hc_g80_100m
